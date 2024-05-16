@@ -24,16 +24,23 @@ describe("GameBoard", () => {
         expect(gameboard.board[1][0]).toEqual(ship);
         expect(gameboard.board[2][0]).toEqual(ship);
     });
+    test("Try to place ship outside of board", () => {
+        const gameboard = new GameBoard();
+        const ship = { getLength: () => 3 };
+        expect(() => {
+            gameboard.placeShip(ship, 0, 8, "horizontal");
+        }).toThrow("Ship is out of bounds");
+    });
     test("GameBoard receiveAttack method records a miss", () => {
         const gameboard = new GameBoard();
-        gameboard.receiveAttack(0, 0);
+        expect(gameboard.receiveAttack(0, 0)).toEqual(true);
         expect(gameboard.board[0][0]).toEqual("miss");
     });
     test("GameBoard receiveAttack method records a hit", () => {
         const gameboard = new GameBoard();
         const ship = { hit: jest.fn() };
         gameboard.board[0][0] = ship;
-        gameboard.receiveAttack(0, 0);
+        expect(gameboard.receiveAttack(0, 0)).toEqual(true);
         expect(ship.hit).toHaveBeenCalled();
     });
     test("GameBoard allSunk method returns false if not all ships are sunk", () => {
@@ -47,5 +54,21 @@ describe("GameBoard", () => {
         const ship = { isSunk: () => true };
         gameboard.board[0][0] = ship;
         expect(gameboard.allSunk()).toEqual(true);
+    });
+    test("Try to receive attack out of bounds", () => {
+        const gameboard = new GameBoard();
+        expect(gameboard.receiveAttack(-1, 0)).toEqual(false);
+    });
+    test("Try to hit a cell that has already been hit", () => {
+        const gameboard = new GameBoard();
+        gameboard.receiveAttack(0, 0);
+        expect(gameboard.receiveAttack(0, 0)).toEqual(false);
+    });
+    test("Try to hit a cell that has a sunk ship", () => {
+        const gameboard = new GameBoard();
+        const ship = { hit: jest.fn(), getLength: () => 1  };
+        gameboard.board[0][0] = ship;
+        gameboard.receiveAttack(0, 0);
+        expect(gameboard.receiveAttack(0, 0)).toEqual(false);
     });
 });
