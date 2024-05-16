@@ -71,4 +71,49 @@ describe("GameBoard", () => {
         gameboard.receiveAttack(0, 0);
         expect(gameboard.receiveAttack(0, 0)).toEqual(false);
     });
+    test("Try to place ship horizontally out of bounds", () => {
+        const gameboard = new GameBoard();
+        const ship = { getLength: () => 3 };
+        expect(() => {
+            gameboard.placeShip(ship, 0, 8, "horizontal");
+        }).toThrow("Ship is out of bounds");
+    });
+
+    test("Try to place ship vertically out of bounds", () => {
+        const gameboard = new GameBoard();
+        const ship = { getLength: () => 3 };
+        expect(() => {
+            gameboard.placeShip(ship, 8, 0, "vertical");
+        }).toThrow("Ship is out of bounds");
+    });
+
+    test("Try to place ship in occupied cells", () => {
+        const gameboard = new GameBoard();
+        const ship1 = { getLength: () => 3 };
+        const ship2 = { getLength: () => 2 };
+        gameboard.placeShip(ship1, 0, 0, "horizontal");
+        expect(() => {
+            gameboard.placeShip(ship2, 0, 0, "vertical");
+        }).toThrow("Cell is occupied");
+    });
+
+    test("Try to place ships adjacent to each other horizontally", () => {
+        const gameboard = new GameBoard();
+        const ship1 = { getLength: () => 3 };
+        const ship2 = { getLength: () => 2 };
+        gameboard.placeShip(ship1, 0, 0, "horizontal");
+        expect(() => {
+            gameboard.placeShip(ship2, 0, 3, "horizontal");
+        }).toThrow("Ships are adjacent");
+    });
+
+    test("Try to place ships adjacent to each other vertically", () => {
+        const gameboard = new GameBoard();
+        const ship1 = { getLength: () => 3 };
+        const ship2 = { getLength: () => 2 };
+        gameboard.placeShip(ship1, 0, 0, "vertical");
+        expect(() => {
+            gameboard.placeShip(ship2, 3, 0, "vertical");
+        }).toThrow("Ships are adjacent");
+    });
 });

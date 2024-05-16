@@ -20,6 +20,29 @@ export default class Player {
             throw new Error("Invalid ship name");
         }
 
-        return this.gameboard.placeShip(this.ships[shipName], x, y, direction);
+        try {
+            this.gameboard.placeShip(this.ships[shipName], x, y, direction);
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
+
+    }
+
+    placeRandomShips() {
+        for (let ship in this.ships) {
+            let placed = false;
+            while (!placed) {
+                let x = Math.floor(Math.random() * 10);
+                let y = Math.floor(Math.random() * 10);
+                let direction = Math.random() < 0.5 ? "horizontal" : "vertical";
+                try {
+                    placed = this.placeShip(ship, x, y, direction);
+                } catch (e) {
+                    placed = false;
+                }
+            }
+        }
     }
 }

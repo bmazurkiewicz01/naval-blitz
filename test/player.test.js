@@ -14,19 +14,10 @@ describe("Player", () => {
     });
     test("Player placeShip method calls gameboard placeShip method with correct arguments", () => {
         const player = new Player();
-        const placeShipMock = jest.fn().mockReturnValue(true);
+        const placeShipMock = jest.fn();
         player.gameboard = { placeShip: placeShipMock};
 
         expect(player.placeShip("carrier", 0, 0, "horizontal")).toEqual(true);
-        expect(placeShipMock).toHaveBeenCalledTimes(1);
-        expect(placeShipMock).toHaveBeenCalledWith(player.ships.carrier, 0, 0, "horizontal");
-    });
-    test("Player placeShip method calls gameboard placeShip method with correct arguments, but the ship cannot be placed", () => {
-        const player = new Player();
-        const placeShipMock = jest.fn().mockReturnValue(false);
-        player.gameboard = { placeShip: placeShipMock};
-
-        expect(player.placeShip("carrier", 0, 0, "horizontal")).toEqual(false);
         expect(placeShipMock).toHaveBeenCalledTimes(1);
         expect(placeShipMock).toHaveBeenCalledWith(player.ships.carrier, 0, 0, "horizontal");
     });
