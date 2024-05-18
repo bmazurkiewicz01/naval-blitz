@@ -62,4 +62,11 @@ export default class UI {
             }
         }
     }
+
+    createStartButton(callback) {
+        const startButton = document.createElement("button");
+        startButton.textContent = "Start Game";
+        startButton.addEventListener("click", callback);
+        this.gameContainer.appendChild(startButton);
+    }
 }
