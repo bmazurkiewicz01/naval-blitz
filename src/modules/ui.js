@@ -63,10 +63,36 @@ export default class UI {
         }
     }
 
-    createStartButton(callback) {
-        const startButton = document.createElement("button");
-        startButton.textContent = "Start Game";
-        startButton.addEventListener("click", callback);
-        this.gameContainer.appendChild(startButton);
+    initializeSetupButtons(startCallback, resetCallback) {
+        const startButton = document.getElementById("start-button");
+        const resetButton = document.getElementById("reset-button");
+
+        startButton.addEventListener("click", startCallback);
+        resetButton.addEventListener("click", resetCallback);
+    }
+
+    toggleStartButton(isVisible) {
+        const startButton = document.getElementById("start-button");
+        startButton.style.display = isVisible ? "block" : "none";
+        startButton.style.opacity = isVisible ? 1 : 0;
+    }
+
+    printMessage(message, error) {
+        const messageElement = document.querySelector(".message");
+        messageElement.textContent = message;
+
+        if (error) {
+            messageElement.classList.add("error");
+        } else {
+            messageElement.classList.remove("error");
+        }
+    }
+
+    refreshNames(playerName, enemyName) {
+        const playerTitle = document.querySelector("#player-title");
+        const enemyTitle = document.querySelector("#enemy-title");
+
+        playerTitle.textContent = playerName;
+        enemyTitle.textContent = enemyName;
     }
 }

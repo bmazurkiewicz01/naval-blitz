@@ -7,11 +7,27 @@ export default class Player {
         this.type = type;
         this.gameboard = new GameBoard();
         this.ships = {
-            carrier: new BattleShip(5),
-            battleship: new BattleShip(4),
-            cruiser: new BattleShip(3),
-            submarine: new BattleShip(3),
-            destroyer: new BattleShip(2)
+            carrier: {
+                ship: new BattleShip(5),
+                placed: false
+
+            },
+            battleship: {
+                ship: new BattleShip(4),
+                placed: false
+            },
+            cruiser: {
+                ship: new BattleShip(3),
+                placed: false
+            },
+            submarine: {
+                ship: new BattleShip(3),
+                placed: false
+            }, 
+            destroyer: {
+                ship: new BattleShip(2),
+                placed: false
+            }
         };
     }
 
@@ -21,7 +37,8 @@ export default class Player {
         }
 
         try {
-            this.gameboard.placeShip(this.ships[shipName], x, y, direction);
+            this.gameboard.placeShip(this.ships[shipName].ship, x, y, direction);
+            this.ships[shipName].placed = true;
             return true;
         }
         catch (e) {
@@ -38,11 +55,26 @@ export default class Player {
                 let y = Math.floor(Math.random() * 10);
                 let direction = Math.random() < 0.5 ? "horizontal" : "vertical";
                 try {
-                    placed = this.placeShip(ship, x, y, direction);
+                    placed = this.placeShip(ship, x, y, direction);;
                 } catch (e) {
                     placed = false;
                 }
             }
+        }
+    }
+
+    areShipsPlaced() {
+        for (let ship in this.ships) {
+            if (!this.ships[ship].placed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    resetShips() {
+        for (let ship in this.ships) {
+            this.ships[ship].placed = false;
         }
     }
 }

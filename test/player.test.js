@@ -19,7 +19,7 @@ describe("Player", () => {
 
         expect(player.placeShip("carrier", 0, 0, "horizontal")).toEqual(true);
         expect(placeShipMock).toHaveBeenCalledTimes(1);
-        expect(placeShipMock).toHaveBeenCalledWith(player.ships.carrier, 0, 0, "horizontal");
+        expect(placeShipMock).toHaveBeenCalledWith(player.ships.carrier.ship, 0, 0, "horizontal");
     });
     test("Player placeShip method called with invalid ship name", () => {
         const player = new Player();

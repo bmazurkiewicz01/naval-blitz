@@ -1,8 +1,6 @@
 export default class GameBoard {
     constructor() {
-        this.board = Array(10)
-            .fill(null)
-            .map(() => Array(10).fill(null));
+        this.resetBoard();
     }
 
     placeShip(ship, x, y, direction) {
@@ -100,5 +98,11 @@ export default class GameBoard {
             .flat()
             .filter((ship) => ship !== null)
             .every((ship) => ship.isSunk());
+    }
+
+    resetBoard() {
+        this.board = Array(10)
+            .fill(null)
+            .map(() => Array(10).fill(null));
     }
 }
