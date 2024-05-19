@@ -1,12 +1,13 @@
 import UI from "./ui";
 import AI from "./ai";
 import Player from "./player";
+import Battleship from "./battleship";
 
 export default class GameManager {
     constructor(playerName="Unnamed", enemyName="Enemy") {
         this.player = new Player(playerName);
         this.enemy = new Player(enemyName, "computer");
-        this.ui = new UI(this.player);
+        this.ui = new UI(this.player, this.enemy);
         this.ai = new AI(this.enemy, this.ui, this.player);
         this.currentPlayer = null;
         this.isGameStarted = false;
@@ -71,20 +72,33 @@ export default class GameManager {
     }
 
     #enemyGridHandler(e) {
-        if (this.isGameStarted && this.currentPlayer === this.player) {
+        if (this.isGameStarted && this.currentPlayer === this.player && !this.ai.duringMove) {
             const cellIndex = this.ui.enemyGridCells.indexOf(e.target);
             const x = Math.floor(cellIndex / 10);
             const y = cellIndex % 10;
+
+            let shipName = null;
+            if (this.enemy.gameboard.board[x][y] instanceof Battleship) {
+                shipName = this.enemy.gameboard.board[x][y].name;
+            }
+
             if(this.enemy.gameboard.receiveAttack(x, y)) {
                 this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
                 this.currentPlayer = this.enemy;
+
+                if (this.enemy.gameboard.board[x][y] == "hit" && shipName !== null) {
+                    if (this.enemy.ships[shipName].ship.isSunk()) {
+                        this.ui.markSunkShip(this.enemy.ships[shipName].ship, false);
+                    }
+                }
+
                 if (this.#checkWinner()) {
                     return;
                 }
                 this.ui.printMessage("Enemy's turn.");
-                this.ai.makeSmartMove();
+                this.ai.duringMove = true;
+                setTimeout(this.ai.makeSmartMove.bind(this.ai), 200 + Math.floor(Math.random() * 600));
                 this.currentPlayer = this.player;
-                // setTimeout(this.#enemyMakeRandomMove.bind(this), 1000 + Math.floor(Math.random() * 1500));
             }
             else {
                 this.ui.printMessage("Invalid move. Try again.", true);
@@ -125,6 +139,7 @@ export default class GameManager {
         this.ui.printMessage("Game was restarted. Please place your ships...");
         this.ui.refreshNames(this.player.name, this.enemy.name);
         this.player.placeRandomShips();
+        this.ui.resetSunkCells();
         this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
         this.ui.enableShipDragging();
     }

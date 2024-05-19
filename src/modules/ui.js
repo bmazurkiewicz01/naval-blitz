@@ -1,13 +1,14 @@
 import GameBoard from "./gameboard";
 
 export default class UI {
-    constructor(player) {
+    constructor(player, enemy) {
         this.gameContainer = document.querySelector(".game-container");
         this.playerGrid = document.querySelector("#player-grid");
         this.enemyGrid = document.querySelector("#enemy-grid");
         this.playerGridCells = [];
         this.enemyGridCells = [];
         this.player = player;
+        this.enemy = enemy;
         this.tempGameBoard = null;
     }
 
@@ -16,7 +17,7 @@ export default class UI {
             const cell = document.createElement("div");
             cell.classList.add("grid-cell");
             cell.dataset.index = i;
-            cell.setAttribute('draggable', false);
+            cell.setAttribute("draggable", false);
             grid.appendChild(cell);
             cells.push(cell);
         }
@@ -43,7 +44,19 @@ export default class UI {
         return this.enemyGridCells[x * 10 + y];
     }
 
-    refreshGrids(playerGameBoard, enemyGameBoard=null, hideEnemyShips=true) {
+    resetSunkCells() {
+        const sunkCells = this.playerGrid.querySelectorAll(".sunk-cell");
+        sunkCells.forEach((cell) => cell.classList.remove("sunk-cell"));
+
+        const enemySunkCells = this.enemyGrid.querySelectorAll(".sunk-cell");
+        enemySunkCells.forEach((cell) => cell.classList.remove("sunk-cell"));
+    }
+
+    refreshGrids(
+        playerGameBoard,
+        enemyGameBoard = null,
+        hideEnemyShips = true
+    ) {
         for (let i = 0; i < 10; i++) {
             for (let j = 0; j < 10; j++) {
                 const playerCell = this.getPlayerGridCell(i, j);
@@ -54,21 +67,31 @@ export default class UI {
                     playerCell.classList.add("miss");
                 } else if (playerGameBoard.board[i][j] !== null) {
                     playerCell.classList.add("ship");
-                    playerCell.dataset.length = playerGameBoard.board[i][j].length;
-                    playerCell.dataset.direction = playerGameBoard.board[i][j].direction;
+                    playerCell.dataset.length =
+                        playerGameBoard.board[i][j].length;
+                    playerCell.dataset.direction =
+                        playerGameBoard.board[i][j].direction;
                     playerCell.dataset.name = playerGameBoard.board[i][j].name;
                 }
 
-                if (enemyGameBoard != null)
-                {
+                if (enemyGameBoard != null) {
                     const enemyCell = this.getEnemyGridCell(i, j);
                     enemyCell.classList.remove("ship", "hit", "miss");
                     if (enemyGameBoard.board[i][j] === "hit") {
                         enemyCell.classList.add("hit");
                     } else if (enemyGameBoard.board[i][j] === "miss") {
                         enemyCell.classList.add("miss");
-                    } else if (enemyGameBoard.board[i][j] !== null && hideEnemyShips === false) {
-                        enemyCell.classList.add("ship");
+                    } else if (enemyGameBoard.board[i][j] !== null) {
+                        enemyCell.dataset.length =
+                            enemyGameBoard.board[i][j].length;
+                        enemyCell.dataset.direction =
+                            enemyGameBoard.board[i][j].direction;
+                        enemyCell.dataset.name =
+                            enemyGameBoard.board[i][j].name;
+
+                        if (hideEnemyShips === false) {
+                            enemyCell.classList.add("ship");
+                        }
                     }
                 }
             }
@@ -113,62 +136,75 @@ export default class UI {
     }
 
     disableShipDragging() {
-        this.playerGridCells.forEach(cell => {
-            cell.setAttribute('draggable', false);
-            cell.removeEventListener('dragstart', this.handleDragStart.bind(this));
-            cell.removeEventListener('dragend', this.handleDragEnd.bind(this));
-            cell.removeEventListener('dragover', this.handleDragOver.bind(this));
-            cell.removeEventListener('drop', this.handleDrop.bind(this));
+        this.playerGridCells.forEach((cell) => {
+            cell.setAttribute("draggable", false);
+            cell.removeEventListener(
+                "dragstart",
+                this.handleDragStart.bind(this)
+            );
+            cell.removeEventListener("dragend", this.handleDragEnd.bind(this));
+            cell.removeEventListener(
+                "dragover",
+                this.handleDragOver.bind(this)
+            );
+            cell.removeEventListener("drop", this.handleDrop.bind(this));
 
-            cell.addEventListener('dragstart', this.eventDisabler);
-            cell.addEventListener('dragend', this.eventDisabler);
-            cell.addEventListener('dragover', this.eventDisabler);
-            cell.addEventListener('drop', this.eventDisabler);
+            cell.addEventListener("dragstart", this.eventDisabler);
+            cell.addEventListener("dragend", this.eventDisabler);
+            cell.addEventListener("dragover", this.eventDisabler);
+            cell.addEventListener("drop", this.eventDisabler);
         });
     }
 
     enableShipDragging() {
-        const ships = this.playerGrid.querySelectorAll('.ship');
-        ships.forEach(ship => this.makeDraggable(ship));
+        const ships = this.playerGrid.querySelectorAll(".ship");
+        ships.forEach((ship) => this.makeDraggable(ship));
 
-        this.playerGridCells.forEach(cell => {
-            cell.removeEventListener('dragstart', this.eventDisabler);
-            cell.removeEventListener('dragend', this.eventDisabler);
-            cell.removeEventListener('dragover', this.eventDisabler);
-            cell.removeEventListener('drop', this.eventDisabler);
-            cell.removeEventListener('dragover', this.handleDragOver.bind(this));
-            cell.removeEventListener('drop', this.handleDrop.bind(this));
+        this.playerGridCells.forEach((cell) => {
+            cell.removeEventListener("dragstart", this.eventDisabler);
+            cell.removeEventListener("dragend", this.eventDisabler);
+            cell.removeEventListener("dragover", this.eventDisabler);
+            cell.removeEventListener("drop", this.eventDisabler);
+            cell.removeEventListener(
+                "dragover",
+                this.handleDragOver.bind(this)
+            );
+            cell.removeEventListener("drop", this.handleDrop.bind(this));
 
-            cell.addEventListener('dragover', this.handleDragOver.bind(this));
-            cell.addEventListener('drop', this.handleDrop.bind(this));
+            cell.addEventListener("dragover", this.handleDragOver.bind(this));
+            cell.addEventListener("drop", this.handleDrop.bind(this));
         });
     }
 
     enableSingleShipDragging(shipName) {
-        const ships = this.playerGrid.querySelectorAll(`.ship[data-name="${shipName}"]`);
-        ships.forEach(ship => this.makeDraggable(ship));
+        const ships = this.playerGrid.querySelectorAll(
+            `.ship[data-name="${shipName}"]`
+        );
+        ships.forEach((ship) => this.makeDraggable(ship));
     }
 
     makeDraggable(ship) {
-        ship.setAttribute('draggable', true);
-        ship.removeEventListener('dragstart', this.eventDisabler);
-        ship.removeEventListener('dragend', this.eventDisabler);
-        ship.removeEventListener('dragstart', this.handleDragStart.bind(this));
-        ship.removeEventListener('dragend', this.handleDragEnd.bind(this));
-        ship.addEventListener('dragstart', this.handleDragStart.bind(this));
-        ship.addEventListener('dragend', this.handleDragEnd.bind(this));
+        ship.setAttribute("draggable", true);
+        ship.removeEventListener("dragstart", this.eventDisabler);
+        ship.removeEventListener("dragend", this.eventDisabler);
+        ship.removeEventListener("dragstart", this.handleDragStart.bind(this));
+        ship.removeEventListener("dragend", this.handleDragEnd.bind(this));
+        ship.addEventListener("dragstart", this.handleDragStart.bind(this));
+        ship.addEventListener("dragend", this.handleDragEnd.bind(this));
     }
 
     handleDragStart(event) {
-        event.dataTransfer.setData('text/plain', event.target.dataset.index);
-        this.tempGameBoard = new GameBoard(this.player.gameboard.deepCopyBoard(this.player.gameboard.board));
+        event.dataTransfer.setData("text/plain", event.target.dataset.index);
+        this.tempGameBoard = new GameBoard(
+            this.player.gameboard.deepCopyBoard(this.player.gameboard.board)
+        );
         setTimeout(() => {
-            event.target.classList.add('hide');
+            event.target.classList.add("hide");
         }, 0);
     }
 
     handleDragEnd(event) {
-        event.target.classList.remove('hide');
+        event.target.classList.remove("hide");
     }
 
     handleDragOver(event) {
@@ -177,33 +213,52 @@ export default class UI {
 
     handleDrop(event) {
         event.preventDefault();
-        const shipId = event.dataTransfer.getData('text/plain');
-        const ship = this.playerGrid.querySelector(`.ship[data-index="${shipId}"]`)
+        const shipId = event.dataTransfer.getData("text/plain");
+        const ship = this.playerGrid.querySelector(
+            `.ship[data-index="${shipId}"]`
+        );
         const cellIndex = event.target.dataset.index;
         const x = Math.floor(cellIndex / 10);
         const y = cellIndex % 10;
 
-        if (!ship || (x * 10 + y) == shipId) {
+        if (!ship || x * 10 + y == shipId) {
             return;
         }
 
         const shipDirection = ship.dataset.direction;
-        const shipToBePlaced = this.tempGameBoard.getShipByName(ship.dataset.name);
+        const shipToBePlaced = this.tempGameBoard.getShipByName(
+            ship.dataset.name
+        );
 
         this.tempGameBoard.removeShip(shipToBePlaced);
 
-        if (this.tempGameBoard.checkIfShipCanBePlaced(shipToBePlaced, x, y, shipDirection)) {
+        if (
+            this.tempGameBoard.checkIfShipCanBePlaced(
+                shipToBePlaced,
+                x,
+                y,
+                shipDirection
+            )
+        ) {
             try {
                 this.player.removeShip(ship.dataset.name);
-    
-                if (this.player.placeShip(ship.dataset.name, x, y, shipDirection)) {
+
+                if (
+                    this.player.placeShip(
+                        ship.dataset.name,
+                        x,
+                        y,
+                        shipDirection
+                    )
+                ) {
                     this.refreshGrids(this.player.gameboard);
                     this.printMessage("Ship placed correctly", false);
                     this.enableSingleShipDragging(ship.dataset.name);
-                }
-                else {
-                    this.printMessage("Invalid placement. Please try again.", true);
-    
+                } else {
+                    this.printMessage(
+                        "Invalid placement. Please try again.",
+                        true
+                    );
                 }
             } catch (error) {
                 this.printMessage(error.message, true);
@@ -211,6 +266,59 @@ export default class UI {
         } else {
             this.printMessage("Invalid placement. Please try again", true);
         }
+    }
 
+    #cellInBounds(x, y) {
+        return x >= 0 && x < 10 && y >= 0 && y < 10;
+    }
+
+    markSunkShip(ship, isPlayer = true) {
+        const cells = isPlayer
+            ? this.playerGrid.querySelectorAll(`.hit[data-name="${ship.name}"]`)
+            : this.enemyGrid.querySelectorAll(`.hit[data-name="${ship.name}"]`);
+
+        cells.forEach((cell) => {
+            const index = parseInt(cell.dataset.index, 10);
+            const x = Math.floor(index / 10);
+            const y = index % 10;
+            const adjacentCells = this.#getAdjacentCells(x, y);
+            adjacentCells.forEach(([adjX, adjY]) => {
+                const adjCell = isPlayer
+                    ? this.getPlayerGridCell(adjX, adjY)
+                    : this.getEnemyGridCell(adjX, adjY);
+                if (
+                    adjCell &&
+                    !adjCell.classList.contains("hit") &&
+                    !adjCell.classList.contains("ship")
+                ) {
+                    adjCell.classList.add("sunk-cell");
+                    if (
+                        isPlayer &&
+                        this.#cellInBounds(adjX, adjY)
+                    ) {
+                        this.player.gameboard.board[adjX][adjY] = "miss";
+                    } else if (
+                        !isPlayer &&
+                        this.#cellInBounds(adjX, adjY)
+                    ) {
+                        this.enemy.gameboard.board[adjX][adjY] = "miss";
+                    }
+                }
+            });
+        });
+    }
+
+    #getAdjacentCells(x, y) {
+        const adjacentCells = [];
+        for (let i = x - 1; i <= x + 1; i++) {
+            for (let j = y - 1; j <= y + 1; j++) {
+                if (i >= 0 && i < 10 && j >= 0 && j < 10) {
+                    if (i !== x || j !== y) {
+                        adjacentCells.push([i, j]);
+                    }
+                }
+            }
+        }
+        return adjacentCells;
     }
 }

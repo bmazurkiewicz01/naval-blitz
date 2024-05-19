@@ -92,15 +92,64 @@ main {
 }
 
 .miss {
-    background-color: #3498db;
+    position: relative;
+}
+
+.miss::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background-color: #e74c3c;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
 }
 
 .hit {
-    background-color: #e74c3c;
+    background-color: #e74d3c75;
+    position: relative;
+}
+
+.hit::before,
+.hit::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 4px;
+    background-color: #300501;
+    transform-origin: center;
+}
+
+.hit::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.hit::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .ship {
     background-color: rgba(46, 204, 113, 0.2);
+}
+
+.sunk-cell {
+    position: relative;
+}
+
+.sunk-cell::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background-color: #e74c3c;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
 }
 
 .ship:hover {

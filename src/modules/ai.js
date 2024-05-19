@@ -1,9 +1,11 @@
+import Battleship from "./battleship";
 export default class AI {
     constructor(enemy, ui, player) {
         this.enemy = enemy;
         this.ui = ui;
         this.player = player;
         this.pendingAttacks = [];
+        this.duringMove = false;
     }
 
     makeSmartMove() {
@@ -37,13 +39,26 @@ export default class AI {
             } while (this.player.gameboard.board[x][y] === "hit" || this.player.gameboard.board[x][y] === "miss");
         }
 
+        let shipName = null;
+        if (this.player.gameboard.board[x][y] instanceof Battleship) {
+            shipName = this.player.gameboard.board[x][y].name;
+        }
+
         const hitSuccessful = this.player.gameboard.receiveAttack(x, y);
         if (hitSuccessful === "hit") {
             this.pendingAttacks.push([x, y]);
         }
 
         this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
+
+        if (shipName !== null) {
+            if (this.player.ships[shipName].ship.isSunk()) {
+                this.ui.markSunkShip(this.player.ships[shipName].ship, true);
+            }
+        }
+
         this.ui.printMessage("Your turn.");
+        this.duringMove = false;
     }
 
     makeRandomMove() {
