@@ -26,10 +26,8 @@ export default class GameManager {
             const cellIndex = this.ui.playerGridCells.indexOf(e.target);
             const x = Math.floor(cellIndex / 10);
             const y = cellIndex % 10;
-            console.log("Player grid", {x, y});
             console.log(this.player.gameboard.receiveAttack(x, y));
             this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
-
             this.currentPlayer = this.player;
             this.ui.printMessage("Your turn.");
         }
@@ -40,10 +38,8 @@ export default class GameManager {
             const cellIndex = this.ui.enemyGridCells.indexOf(e.target);
             const x = Math.floor(cellIndex / 10);
             const y = cellIndex % 10;
-            console.log("Enemy grid", {x, y});
             console.log(this.enemy.gameboard.receiveAttack(x, y));
             this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
-
             this.currentPlayer = this.enemy;
             this.ui.printMessage("Enemy's turn.");
         }
@@ -78,8 +74,10 @@ export default class GameManager {
         this.enemy.gameboard.resetBoard();
         this.player.resetShips();
         this.enemy.resetShips();
-        this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
         this.ui.printMessage("Game was restarted. Please place your ships...");
         this.ui.refreshNames(this.player.name, this.enemy.name);
+        this.player.placeRandomShips();
+        this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
+        this.ui.enableShipDragging();
     }
 }

@@ -1,3 +1,5 @@
+import GameBoard from "./gameboard";
+
 export default class UI {
     constructor(player) {
         this.gameContainer = document.querySelector(".game-container");
@@ -13,6 +15,7 @@ export default class UI {
             const cell = document.createElement("div");
             cell.classList.add("grid-cell");
             cell.dataset.index = i;
+            cell.setAttribute('draggable', false);
             grid.appendChild(cell);
             cells.push(cell);
         }
@@ -105,7 +108,7 @@ export default class UI {
     }
 
     enableShipDragging() {
-        const ships = this.playerGrid.querySelectorAll('.grid-cell.ship');
+        const ships = this.playerGrid.querySelectorAll('.ship');
         ships.forEach(ship => this.makeDraggable(ship));
 
         this.playerGridCells.forEach(cell => {
@@ -114,8 +117,15 @@ export default class UI {
         });
     }
 
+    enableSingleShipDragging(shipName) {
+        const ships = this.playerGrid.querySelectorAll(`.ship[data-name="${shipName}"]`);
+        ships.forEach(ship => this.makeDraggable(ship));
+    }
+
     makeDraggable(ship) {
         ship.setAttribute('draggable', true);
+        ship.removeEventListener('dragstart', this.handleDragStart.bind(this));
+        ship.removeEventListener('dragend', this.handleDragEnd.bind(this));
         ship.addEventListener('dragstart', this.handleDragStart.bind(this));
         ship.addEventListener('dragend', this.handleDragEnd.bind(this));
     }
@@ -138,31 +148,35 @@ export default class UI {
     handleDrop(event) {
         event.preventDefault();
         const shipId = event.dataTransfer.getData('text/plain');
-        const ship = document.querySelector(`.grid-cell.ship[data-index="${shipId}"]`)
+        const ship = this.playerGrid.querySelector(`.ship[data-index="${shipId}"]`)
         const cellIndex = event.target.dataset.index;
-        const cell = this.playerGridCells[cellIndex];
         const x = Math.floor(cellIndex / 10);
         const y = cellIndex % 10;
 
-        if (!ship) {
+        if (!ship || (x * 10 + y) == shipId) {
             return;
         }
 
-        const shipLength = parseInt(ship.dataset.length);
         const shipDirection = ship.dataset.direction;
+        const gameBoardTemp = new GameBoard(Array.from(this.player.gameboard.board));
+
 
         try {
             this.player.removeShip(ship.dataset.name);
+
             if (this.player.placeShip(ship.dataset.name, x, y, shipDirection)) {
                 this.refreshGrids(this.player.gameboard);
                 this.printMessage("Ship placed correctly", false);
-                this.enableShipDragging();
+                this.enableSingleShipDragging(ship.dataset.name);
             }
             else {
                 this.printMessage("Invalid placement", true);
+                this.player.gameboard = gameBoardTemp;
+
             }
         } catch (error) {
             this.printMessage(error.message, true);
+            this.player.gameboard = gameBoardTemp;
         }
     }
 }

@@ -52,7 +52,6 @@ export default class Player {
         if (!this.ships[shipName]) {
             throw new Error("Invalid ship name");
         }
-
         const ship = this.ships[shipName].ship;
         this.gameboard.removeShip(ship);
     }

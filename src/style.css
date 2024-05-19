@@ -103,6 +103,10 @@ main {
     background-color: rgba(46, 204, 113, 0.2);
 }
 
+.ship:hover {
+    background-color: rgba(46, 204, 113, 0.3);
+}
+
 .setup-buttons {
     display: flex;
     justify-content: center;
