@@ -28,6 +28,7 @@ export default class GameManager {
         this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
         this.ui.refreshNames(this.player.name, this.enemy.name);
         this.ui.enableShipDragging();
+        this.ui.setupChangeNameDialog();
     }
 
     #checkWinner() {

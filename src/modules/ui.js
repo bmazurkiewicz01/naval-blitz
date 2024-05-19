@@ -292,15 +292,9 @@ export default class UI {
                     !adjCell.classList.contains("ship")
                 ) {
                     adjCell.classList.add("sunk-cell");
-                    if (
-                        isPlayer &&
-                        this.#cellInBounds(adjX, adjY)
-                    ) {
+                    if (isPlayer && this.#cellInBounds(adjX, adjY)) {
                         this.player.gameboard.board[adjX][adjY] = "miss";
-                    } else if (
-                        !isPlayer &&
-                        this.#cellInBounds(adjX, adjY)
-                    ) {
+                    } else if (!isPlayer && this.#cellInBounds(adjX, adjY)) {
                         this.enemy.gameboard.board[adjX][adjY] = "miss";
                     }
                 }
@@ -320,5 +314,50 @@ export default class UI {
             }
         }
         return adjacentCells;
+    }
+
+    setupChangeNameDialog() {
+        const btn = document.getElementById("change-name-btn");
+        const dialog = document.getElementById("change-name-dialog");
+        const closeBtn = dialog.querySelector(".close");
+        const form = dialog.querySelector("form");
+        const input = dialog.querySelector("input");
+        dialog.addEventListener("click", function (event) {
+            var rect = dialog.getBoundingClientRect();
+            var isInDialog =
+                rect.top <= event.clientY &&
+                event.clientY <= rect.top + rect.height &&
+                rect.left <= event.clientX &&
+                event.clientX <= rect.left + rect.width;
+            if (!isInDialog) {
+                dialog.style.display = "none";
+                dialog.close();
+            }
+        });
+
+        btn.addEventListener("click", () => {
+            dialog.style.display = "flex";
+            dialog.showModal();
+        });
+
+        closeBtn.addEventListener("click", () => {
+            dialog.style.display = "none";
+            dialog.close();
+        });
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const name = input.value;
+            if (name) {
+                this.player.name = name;
+                this.refreshNames(this.player.name, this.enemy.name);
+                dialog.style.display = "none";
+            }
+        });
+
+        // document.querySelector("main").addEventListener("click", (e) => {
+        //     dialog.style.display = "none";
+        //     dialog.close();
+        // });
     }
 }

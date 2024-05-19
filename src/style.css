@@ -211,6 +211,62 @@ main {
     border: 1px solid #e74c3c;
 }
 
+#change-name-dialog {
+    display: hidden;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(31, 41, 45, 0.8);
+    border: 1px solid rgb(20, 79, 128);
+    border-radius: 10px;
+    position: absolute;
+    top: 10%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    width: 20%;
+    height: 20%;
+}
+
+dialog::backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 99;
+}
+
+#change-name-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#change-name-form label {
+    font-weight: 700;
+    color: rgb(209, 213, 219);
+}
+
+#change-name-form input {
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid rgb(20, 79, 128);
+    background-color: rgba(56, 84, 96, 0.8);
+    color: rgb(209, 213, 219);
+    font: inherit;
+    width: 100%;
+}
+
+#change-name-form input:focus {
+    outline: none;
+}
+
 footer {
     text-align: center;
     padding-bottom: 1rem;
