@@ -8,24 +8,24 @@ export default class Player {
         this.gameboard = new GameBoard();
         this.ships = {
             carrier: {
-                ship: new BattleShip(5),
+                ship: new BattleShip(5, name="carrier"),
                 placed: false
 
             },
             battleship: {
-                ship: new BattleShip(4),
+                ship: new BattleShip(4, name="battleship"),
                 placed: false
             },
             cruiser: {
-                ship: new BattleShip(3),
+                ship: new BattleShip(3, name="cruiser"),
                 placed: false
             },
             submarine: {
-                ship: new BattleShip(3),
+                ship: new BattleShip(3, name="submarine"),
                 placed: false
             }, 
             destroyer: {
-                ship: new BattleShip(2),
+                ship: new BattleShip(2, name="destroyer"),
                 placed: false
             }
         };
@@ -37,6 +37,7 @@ export default class Player {
         }
 
         try {
+            this.ships[shipName].ship.setDirection(direction);
             this.gameboard.placeShip(this.ships[shipName].ship, x, y, direction);
             this.ships[shipName].placed = true;
             return true;
@@ -47,6 +48,15 @@ export default class Player {
 
     }
 
+    removeShip(shipName) {
+        if (!this.ships[shipName]) {
+            throw new Error("Invalid ship name");
+        }
+
+        const ship = this.ships[shipName].ship;
+        this.gameboard.removeShip(ship);
+    }
+
     placeRandomShips() {
         for (let ship in this.ships) {
             let placed = false;
@@ -54,8 +64,9 @@ export default class Player {
                 let x = Math.floor(Math.random() * 10);
                 let y = Math.floor(Math.random() * 10);
                 let direction = Math.random() < 0.5 ? "horizontal" : "vertical";
+
                 try {
-                    placed = this.placeShip(ship, x, y, direction);;
+                    placed = this.placeShip(ship, x, y, direction);
                 } catch (e) {
                     placed = false;
                 }

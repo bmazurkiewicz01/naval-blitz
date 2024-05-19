@@ -1,8 +1,10 @@
 export default class Battleship {
-    constructor(length, hits=0, sunk=false) {
+    constructor(length, name="unnamed", hits=0, sunk=false, direction="horizontal") {
         this.length = length;
         this.hits = hits;
+        this.name = name;
         this.sunk = sunk;
+        this.direction = direction;
     }
 
     hit() {
@@ -22,5 +24,9 @@ export default class Battleship {
 
     getHits() {
         return this.hits;
+    }
+
+    setDirection(direction) {
+        this.direction = direction;
     }
 };

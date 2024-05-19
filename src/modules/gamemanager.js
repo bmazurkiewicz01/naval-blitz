@@ -5,7 +5,7 @@ export default class GameManager {
     constructor(playerName="Unnamed", enemyName="Enemy") {
         this.player = new Player(playerName);
         this.enemy = new Player(enemyName, "computer");
-        this.ui = new UI();
+        this.ui = new UI(this.player);
         this.currentPlayer = null;
         this.isGameStarted = false;
     }
@@ -18,6 +18,7 @@ export default class GameManager {
         this.player.placeRandomShips();
         this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
         this.ui.refreshNames(this.player.name, this.enemy.name);
+        this.ui.enableShipDragging();
     }
 
     #playerGridHandler(e) {

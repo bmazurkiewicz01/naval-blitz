@@ -65,6 +65,12 @@ main {
     width: 30px;
     height: 30px;
     filter: invert(92%) sepia(8%) saturate(147%) hue-rotate(177deg) brightness(91%) contrast(95%);
+    cursor: pointer;
+    transition: filter 0.3s ease-in-out;
+}
+
+.player-box img:hover {
+    filter: invert(40%) sepia(98%) saturate(597%) hue-rotate(171deg) brightness(96%) contrast(96%);
 }
 
 .grid {
