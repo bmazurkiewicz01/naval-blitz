@@ -136,6 +136,8 @@ export default class UI {
             cell.removeEventListener('dragend', this.eventDisabler);
             cell.removeEventListener('dragover', this.eventDisabler);
             cell.removeEventListener('drop', this.eventDisabler);
+            cell.removeEventListener('dragover', this.handleDragOver.bind(this));
+            cell.removeEventListener('drop', this.handleDrop.bind(this));
 
             cell.addEventListener('dragover', this.handleDragOver.bind(this));
             cell.addEventListener('drop', this.handleDrop.bind(this));
@@ -201,16 +203,13 @@ export default class UI {
                 }
                 else {
                     this.printMessage("Invalid placement. Please try again.", true);
-                    this.player.gameboard.board = this.tempGameBoard;
     
                 }
             } catch (error) {
                 this.printMessage(error.message, true);
-                this.player.gameboard.board = this.tempGameBoard;
             }
         } else {
-            this.printMessage("Invalid placement. Please try again.d", true);
-            return;
+            this.printMessage("Invalid placement. Please try again", true);
         }
 
     }

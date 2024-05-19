@@ -12,8 +12,14 @@ export default class GameManager {
 
     initializeGame() {
         this.ui.renderGrids();
-        this.ui.createPlayerGridHandler(this.#playerGridHandler.bind(this));
+        if (this.enemy.type === "computer") {
+            this.ui.createPlayerGridHandler((e) => {e.preventDefault();});
+        }
+        else {
+            this.ui.createPlayerGridHandler(this.#playerGridHandler.bind(this));
+        }
         this.ui.createEnemyGridHandler(this.#enemyGridHandler.bind(this));
+    
         this.ui.initializeSetupButtons(this.#startGame.bind(this), this.#resetGame.bind(this));
         this.player.placeRandomShips();
         this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
@@ -21,13 +27,42 @@ export default class GameManager {
         this.ui.enableShipDragging();
     }
 
+    #checkWinner() {
+        if (this.player.gameboard.allSunk()) {
+            this.ui.printMessage("You lost! Game over.", false);
+            return true;
+        }
+        else if (this.enemy.gameboard.allSunk()) {
+            this.ui.printMessage("You won! Game over.", false);
+            return true;
+        }
+        return false;
+    }
+
+    #enemyMakeRandomMove() {
+        if (this.isGameStarted && this.currentPlayer === this.enemy) {
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * 10);
+                y = Math.floor(Math.random() * 10);
+            } while (this.player.gameboard.board[x][y] === "hit" || this.player.gameboard.board[x][y] === "miss");
+            this.player.gameboard.receiveAttack(x, y);
+            this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
+            this.currentPlayer = this.player;
+            this.ui.printMessage("Your turn.");
+        }
+    }
+
     #playerGridHandler(e) {
         if (this.isGameStarted && this.currentPlayer === this.enemy) {
             const cellIndex = this.ui.playerGridCells.indexOf(e.target);
             const x = Math.floor(cellIndex / 10);
             const y = cellIndex % 10;
-            console.log(this.player.gameboard.receiveAttack(x, y));
+            this.player.gameboard.receiveAttack(x, y);
             this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
+            if (this.#checkWinner()) {
+                return;
+            }
             this.currentPlayer = this.player;
             this.ui.printMessage("Your turn.");
         }
@@ -38,10 +73,19 @@ export default class GameManager {
             const cellIndex = this.ui.enemyGridCells.indexOf(e.target);
             const x = Math.floor(cellIndex / 10);
             const y = cellIndex % 10;
-            console.log(this.enemy.gameboard.receiveAttack(x, y));
-            this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
-            this.currentPlayer = this.enemy;
-            this.ui.printMessage("Enemy's turn.");
+            if(this.enemy.gameboard.receiveAttack(x, y)) {
+                this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
+                this.currentPlayer = this.enemy;
+                if (this.#checkWinner()) {
+                    return;
+                }
+                this.ui.printMessage("Enemy's turn.");
+                this.#enemyMakeRandomMove();
+            }
+            else {
+                this.ui.printMessage("Invalid move. Try again.", true);
+            }
+            // setTimeout(this.#enemyMakeRandomMove.bind(this), 1000 + Math.floor(Math.random() * 1500));
         }
     }
 

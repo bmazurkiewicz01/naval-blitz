@@ -161,7 +161,7 @@ export default class GameBoard {
     allSunk() {
         return this.board
             .flat()
-            .filter((ship) => ship !== null)
+            .filter((ship) => ship !== null && ship !== "miss" && ship !== "hit")
             .every((ship) => ship.isSunk());
     }
 

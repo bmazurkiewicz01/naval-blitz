@@ -85,6 +85,7 @@ export default class Player {
     resetShips() {
         for (let ship in this.ships) {
             this.ships[ship].placed = false;
+            this.ships[ship].ship = new BattleShip(this.ships[ship].ship.length, this.ships[ship].ship.name);
         }
     }
 }
