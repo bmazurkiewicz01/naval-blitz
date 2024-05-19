@@ -1,4 +1,5 @@
 import UI from "./ui";
+import AI from "./ai";
 import Player from "./player";
 
 export default class GameManager {
@@ -6,6 +7,7 @@ export default class GameManager {
         this.player = new Player(playerName);
         this.enemy = new Player(enemyName, "computer");
         this.ui = new UI(this.player);
+        this.ai = new AI(this.enemy, this.ui, this.player);
         this.currentPlayer = null;
         this.isGameStarted = false;
     }
@@ -80,12 +82,13 @@ export default class GameManager {
                     return;
                 }
                 this.ui.printMessage("Enemy's turn.");
-                this.#enemyMakeRandomMove();
+                this.ai.makeSmartMove();
+                this.currentPlayer = this.player;
+                // setTimeout(this.#enemyMakeRandomMove.bind(this), 1000 + Math.floor(Math.random() * 1500));
             }
             else {
                 this.ui.printMessage("Invalid move. Try again.", true);
             }
-            // setTimeout(this.#enemyMakeRandomMove.bind(this), 1000 + Math.floor(Math.random() * 1500));
         }
     }
 

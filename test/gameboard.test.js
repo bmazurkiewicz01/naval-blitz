@@ -33,14 +33,14 @@ describe("GameBoard", () => {
     });
     test("GameBoard receiveAttack method records a miss", () => {
         const gameboard = new GameBoard();
-        expect(gameboard.receiveAttack(0, 0)).toEqual(true);
+        expect(gameboard.receiveAttack(0, 0)).toEqual("miss");
         expect(gameboard.board[0][0]).toEqual("miss");
     });
     test("GameBoard receiveAttack method records a hit", () => {
         const gameboard = new GameBoard();
         const ship = { hit: jest.fn() };
         gameboard.board[0][0] = ship;
-        expect(gameboard.receiveAttack(0, 0)).toEqual(true);
+        expect(gameboard.receiveAttack(0, 0)).toEqual("hit");
         expect(ship.hit).toHaveBeenCalled();
     });
     test("GameBoard allSunk method returns false if not all ships are sunk", () => {

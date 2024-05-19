@@ -43,7 +43,7 @@ export default class UI {
         return this.enemyGridCells[x * 10 + y];
     }
 
-    refreshGrids(playerGameBoard, enemyGameBoard=null) {
+    refreshGrids(playerGameBoard, enemyGameBoard=null, hideEnemyShips=true) {
         for (let i = 0; i < 10; i++) {
             for (let j = 0; j < 10; j++) {
                 const playerCell = this.getPlayerGridCell(i, j);
@@ -67,7 +67,7 @@ export default class UI {
                         enemyCell.classList.add("hit");
                     } else if (enemyGameBoard.board[i][j] === "miss") {
                         enemyCell.classList.add("miss");
-                    } else if (enemyGameBoard.board[i][j] !== null) {
+                    } else if (enemyGameBoard.board[i][j] !== null && hideEnemyShips === false) {
                         enemyCell.classList.add("ship");
                     }
                 }

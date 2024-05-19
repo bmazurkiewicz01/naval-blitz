@@ -147,11 +147,11 @@ export default class GameBoard {
         }
         if (this.board[x][y] === null) {
             this.board[x][y] = "miss";
-            return true;
+            return this.board[x][y];
         } else if (this.board[x][y] !== "hit") {
             this.board[x][y].hit();
             this.board[x][y] = "hit";
-            return true;
+            return this.board[x][y];
         }
         else {
             return false;
