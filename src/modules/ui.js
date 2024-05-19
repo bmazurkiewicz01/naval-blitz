@@ -8,6 +8,7 @@ export default class UI {
         this.playerGridCells = [];
         this.enemyGridCells = [];
         this.player = player;
+        this.tempGameBoard = null;
     }
 
     createGrid(grid, cells) {
@@ -107,11 +108,35 @@ export default class UI {
         enemyTitle.textContent = enemyName;
     }
 
+    eventDisabler(event) {
+        event.preventDefault();
+    }
+
+    disableShipDragging() {
+        this.playerGridCells.forEach(cell => {
+            cell.setAttribute('draggable', false);
+            cell.removeEventListener('dragstart', this.handleDragStart.bind(this));
+            cell.removeEventListener('dragend', this.handleDragEnd.bind(this));
+            cell.removeEventListener('dragover', this.handleDragOver.bind(this));
+            cell.removeEventListener('drop', this.handleDrop.bind(this));
+
+            cell.addEventListener('dragstart', this.eventDisabler);
+            cell.addEventListener('dragend', this.eventDisabler);
+            cell.addEventListener('dragover', this.eventDisabler);
+            cell.addEventListener('drop', this.eventDisabler);
+        });
+    }
+
     enableShipDragging() {
         const ships = this.playerGrid.querySelectorAll('.ship');
         ships.forEach(ship => this.makeDraggable(ship));
 
         this.playerGridCells.forEach(cell => {
+            cell.removeEventListener('dragstart', this.eventDisabler);
+            cell.removeEventListener('dragend', this.eventDisabler);
+            cell.removeEventListener('dragover', this.eventDisabler);
+            cell.removeEventListener('drop', this.eventDisabler);
+
             cell.addEventListener('dragover', this.handleDragOver.bind(this));
             cell.addEventListener('drop', this.handleDrop.bind(this));
         });
@@ -124,6 +149,8 @@ export default class UI {
 
     makeDraggable(ship) {
         ship.setAttribute('draggable', true);
+        ship.removeEventListener('dragstart', this.eventDisabler);
+        ship.removeEventListener('dragend', this.eventDisabler);
         ship.removeEventListener('dragstart', this.handleDragStart.bind(this));
         ship.removeEventListener('dragend', this.handleDragEnd.bind(this));
         ship.addEventListener('dragstart', this.handleDragStart.bind(this));
@@ -132,6 +159,7 @@ export default class UI {
 
     handleDragStart(event) {
         event.dataTransfer.setData('text/plain', event.target.dataset.index);
+        this.tempGameBoard = new GameBoard(this.player.gameboard.deepCopyBoard(this.player.gameboard.board));
         setTimeout(() => {
             event.target.classList.add('hide');
         }, 0);
@@ -158,25 +186,32 @@ export default class UI {
         }
 
         const shipDirection = ship.dataset.direction;
-        const gameBoardTemp = new GameBoard(Array.from(this.player.gameboard.board));
+        const shipToBePlaced = this.tempGameBoard.getShipByName(ship.dataset.name);
 
+        this.tempGameBoard.removeShip(shipToBePlaced);
 
-        try {
-            this.player.removeShip(ship.dataset.name);
-
-            if (this.player.placeShip(ship.dataset.name, x, y, shipDirection)) {
-                this.refreshGrids(this.player.gameboard);
-                this.printMessage("Ship placed correctly", false);
-                this.enableSingleShipDragging(ship.dataset.name);
+        if (this.tempGameBoard.checkIfShipCanBePlaced(shipToBePlaced, x, y, shipDirection)) {
+            try {
+                this.player.removeShip(ship.dataset.name);
+    
+                if (this.player.placeShip(ship.dataset.name, x, y, shipDirection)) {
+                    this.refreshGrids(this.player.gameboard);
+                    this.printMessage("Ship placed correctly", false);
+                    this.enableSingleShipDragging(ship.dataset.name);
+                }
+                else {
+                    this.printMessage("Invalid placement. Please try again.", true);
+                    this.player.gameboard.board = this.tempGameBoard;
+    
+                }
+            } catch (error) {
+                this.printMessage(error.message, true);
+                this.player.gameboard.board = this.tempGameBoard;
             }
-            else {
-                this.printMessage("Invalid placement", true);
-                this.player.gameboard = gameBoardTemp;
-
-            }
-        } catch (error) {
-            this.printMessage(error.message, true);
-            this.player.gameboard = gameBoardTemp;
+        } else {
+            this.printMessage("Invalid placement. Please try again.d", true);
+            return;
         }
+
     }
 }

@@ -58,6 +58,7 @@ export default class GameManager {
         this.isGameStarted = true;
         this.currentPlayer = this.player;
         this.enemy.placeRandomShips();
+        this.ui.disableShipDragging();
         this.ui.refreshGrids(this.player.gameboard, this.enemy.gameboard);
         this.ui.toggleStartButton(false);
         this.ui.printMessage("Game started! Your turn.");

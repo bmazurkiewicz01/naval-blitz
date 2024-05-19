@@ -1,3 +1,5 @@
+import Battleship from "./battleship";
+
 export default class GameBoard {
     constructor(board=null) {
         this.board = board === null ? Array(10)
@@ -31,14 +33,65 @@ export default class GameBoard {
         }
     }
 
+    checkIfShipCanBePlaced(ship, x, y, direction) {
+        if (ship === null) {
+            return false;
+        }
+
+        if (direction === "horizontal" && y + ship.getLength() > 10) {
+            return false;
+        } else if (direction === "vertical" && x + ship.getLength() > 10) {
+            return false;
+        }
+
+        if (!this.#checkIfCellIsNotOccupied(x, y, ship.getLength(), direction)) {
+            return false;
+        }
+
+        if (!this.#checkIfShipIsNotAdjacent(x, y, ship.getLength(), direction)) {
+            return false;
+        }
+
+        return true;
+    }
+
     removeShip(ship) {
+        if (ship === null) {
+            return;
+        }
         for (let i = 0; i < 10; i++) {
             for (let j = 0; j < 10; j++) {
-                if (this.board[i][j] === ship) {
+                if (this.board[i][j] !== null && this.board[i][j].name == ship.name) {
                     this.board[i][j] = null;
                 }
             }
         }
+    }
+
+    getShipByName(shipName) {
+        for (let i = 0; i < 10; i++) {
+            for (let j = 0; j < 10; j++) {
+                if (this.board[i][j] !== null && this.board[i][j].name == shipName) {
+                    return this.board[i][j];
+                }
+            }
+        }
+        return null;
+    }
+
+    deepCopyBoard(board) {
+        const newBoard = Array(10).fill(null).map(() => Array(10).fill(null));
+        for (let i = 0; i < 10; i++) {
+            for (let j = 0; j < 10; j++) {
+                const cell = board[i][j];
+                if (cell instanceof Battleship) {
+                    newBoard[i][j] = new Battleship(cell.getLength(), cell.name, cell.getHits(), cell.isSunk(), cell.direction);
+                } else {
+                    newBoard[i][j] = cell;
+                }
+            }
+        }
+        return newBoard;
     }
 
     #checkIfCellIsNotOccupied(x, y, length, direction) {
